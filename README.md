@@ -1,7 +1,11 @@
 # rp-liquid-tutorial
 Tutorial for RP
 mark
-To install simply run `cabal build`
+To install simply clone the repo and run 
+
+```
+cabal build
+```
 
 Yet, it requires `ghc-9.12.2` and `Z3`!
 
