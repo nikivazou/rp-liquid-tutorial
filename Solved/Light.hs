@@ -1,4 +1,4 @@
-module Light where 
+module Solved.Light where 
 
 -- 1. Let's test the build-in (!!) indexing 
 

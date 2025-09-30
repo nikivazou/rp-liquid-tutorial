@@ -1,6 +1,6 @@
 {-@ LIQUID "--reflection"     @-}
 
-module Fibonacci where
+module Solved.Fibonacci where
 
 import ProofCombinators
 import GHC.Exts (the)

@@ -1,9 +1,9 @@
 {-@ LIQUID "--reflection" @-}
 {-@ LIQUID "--ple" @-}
-module Deep where 
+module Solved.Deep where 
 
 import Prelude hiding ((++), reverse)
--- import Language.Haskell.Liquid.ProofCombinators
+import ProofCombinators
 {-@ infixr ++ @-}
 
 {-@ rightId :: xs:[a] -> { xs ++ [] = xs } @-}
@@ -39,9 +39,6 @@ distributivityRW :: [a] -> [a] -> ()
 distributivityRW [] ys = () 
 distributivityRW (x:xs) ys = distributivityRW xs ys
 
-distributivity :: [a] -> [a] -> () 
-{-@ distributivity :: xs:[a] -> ys:[a] 
-                   -> { v:() | reverse (xs ++ ys) == reverse ys ++ reverse xs }  @-}
 distributivity :: [a] -> [a] -> () 
 {-@ distributivity :: xs:[a] -> ys:[a] 
                    -> { reverse (xs ++ ys) == reverse ys ++ reverse xs }  @-}

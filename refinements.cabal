@@ -8,11 +8,11 @@ library
   exposed-modules:
       ProofCombinators, 
       Light,
-      Light.Solved,
+      Solved.Light,
       Deep, 
-      Deep.Solved,
+      Solved.Deep,
       Fibonacci, 
-      Fibonacci.Solved   
+      Solved.Fibonacci   
   build-depends:
        liquidhaskell, 
        liquid-prelude,
