@@ -15,7 +15,7 @@ module ProofCombinators (
   , (=<=)  -- proof of equality is implicit eg. x <= y
   , (=>=)  -- proof of equality is implicit eg. x =>= y 
 
-  , assertLiquid -- :: {b:Bool | b} -> a -> a
+  , liquidAssert -- :: {b:Bool | b} -> a -> a
 
 ) where
 
@@ -117,6 +117,6 @@ x ? _ = x
 {-@ type Prop E = {v:_ | prop v = E} @-}
 
 
-{-@ assertLiquid :: {b:Bool | b} -> a -> a @-}
-assertLiquid :: Bool -> a -> a
-assertLiquid _  x = x
+{-@ liquidAssert :: {b:Bool | b} -> a -> a @-}
+liquidAssert :: Bool -> a -> a
+liquidAssert _  x = x

@@ -3,8 +3,6 @@
 module Solved.Fibonacci where
 
 import ProofCombinators
-import GHC.Exts (the)
-import Language.Haskell.Liquid.Prelude (liquidAssert)
 
 ------------------------------------------------------------------------------------------
 -- OUTLINE OF THE TUTORIAL
