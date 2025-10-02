@@ -27,6 +27,7 @@ fib i | i == 0     = 1
       | otherwise  = fib (i-1) + fib (i-2)
 
 
+
 ------------------------------------------------------------------------------------------
 -- | 1   Light Verification
 ------------------------------------------------------------------------------------------
@@ -70,27 +71,44 @@ fib0 _ = undefined
 {-@ reflect fib @-}
 
 
+
+
+
+
 {-@ fib1 :: () -> { fib 1 == 1 } @-}
 fib1 :: () -> ()
 fib1 _ = undefined 
 
 
+
+
+
 {-@ fib3 :: () -> { fib 3 == 3 } @-}
 fib3 :: () -> ()
 fib3 _ = undefined
+       
+
+
 
 -- | To automate such kind of standard evaluation steps, we can use the PLE flag.
 
-{-@ LIQUID "--ple" @-}
+{- LIQUID "--ple" @-}
+
+
+
+
+
+
+
 
 fib3ple :: () -> ()
 {-@ fib3ple :: () -> { fib 3 == 3 } @-}
-fib3ple _ = ()
+fib3ple _ = undefined
 
 
-{-@ fib16 :: { fib 16 == 1597 } @-}
+{-@ fib16 :: () -> { fib 16 == 1597 } @-}
 fib16 :: () -> ()
-fib16 _ = ()
+fib16 _ = undefined
 
 
 ------------------------------------------------------------------------------------------
@@ -104,6 +122,11 @@ fibIncr :: Int -> ()
 fibIncr = undefined 
 
 
+
+
+
+
+
 -- | Note that Liquid Haskell checks that the proof is terminating and that all cases are covered.
 -- | It is a _mathematical_ proof! 
 
@@ -115,11 +138,31 @@ fibIncr = undefined
 
 {-@ fibMono :: i:Nat -> j:{Nat | i < j} -> { fib i <= fib j } @-}
 fibMono :: Int -> Int -> ()
-fibMono i j  = undefined 
+fibMono = undefined
+
+
+
+
+
+
+
+
+
+
 
 -- Interestingly, the proof requires the `fibIncr` lemma, but not the definition of `fib` itself!
 -- So, we can abstract away the definition of `fib` and state that 
 -- each increasing function is monotonic! 
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -164,6 +207,9 @@ reachable8 :: () -> (Int, ())
 reachable8 _ = undefined 
 
 
+
+
+
 ------------------------------------------------------------------------------------------
 -- | 3.2 Is 7 reachable by fib?
 ------------------------------------------------------------------------------------------
@@ -179,4 +225,4 @@ To show non reachability, we need to negate the existential.
 
 {-@ unreachable7 :: () -> ((x::Nat, { v:() | fib x == 7}) -> ({v:() |  False})) @-}
 unreachable7 :: () -> ((Int, ()) -> ())
-unreachable7 _ = undefined 
+unreachable7 = undefined 

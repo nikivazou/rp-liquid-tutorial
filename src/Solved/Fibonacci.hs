@@ -20,11 +20,10 @@ import ProofCombinators
 -- | 0. Definition and Termination
 ------------------------------------------------------------------------------------------
 
-{-@ fib :: i:Nat -> {v:Nat | i <= v && fibMod3 i v }  @-}
+{-@ fib :: i:{Int | 0 <= i} -> {v:Int | 0 <= v && i <= v && fibMod3 i v} @-}
 fib :: Int -> Int
 fib i | i == 0     = 1 
       | i == 1     = 1 
-      | i == 2     = 2 
       | otherwise  = fib (i-1) + fib (i-2)
 
 
@@ -32,7 +31,11 @@ fib i | i == 0     = 1
 -- | 1   Light Verification
 ------------------------------------------------------------------------------------------
 -- | 1.1 The result is always >= the input
+-- {-@ fib :: i:Nat -> {v:Nat | i <= v }  @-}
+
+
 -- | 1.2 The parity of the result follows a pattern based on i mod 3
+-- {-@ fib :: i:Nat -> {v:Nat | fibMod3 i v }  @-}
 ------------------------------------------------------------------------------------------
 
 {-@ inline fibMod3 @-}
@@ -54,9 +57,9 @@ fibMod3 i v = if i `mod` 3 == 0 || i `mod` 3 == 1 then v `mod` 2 == 1 else v `mo
 -- | To express properties about fib, **extrinsically**, ie outside of its type signature, 
 -- | we simply use the unit type `()` refined with the property we want to prove.
 
-{-@ fib0 :: () -> { fib 0 == 1 } @-}
+{-@ fib0 :: () -> {v:() |  fib 0 == 1 } @-}
 fib0 :: () -> ()
-fib0 _ = fib 0 === 1 *** QED 
+fib0 _ = undefined  
 
 -- | But, the Haskell functions, like fib, are not allows by default in the refinement logic.
 
@@ -67,31 +70,42 @@ fib0 _ = fib 0 === 1 *** QED
 {-@ reflect fib @-}
 
 
+
+
 {-@ fib1 :: () -> { fib 1 == 1 } @-}
 fib1 :: () -> ()
-fib1 _ = fib 1 === 1 *** QED
+fib1 _ = fib 1 === 1 *** QED 
+
+
+
 
 
 {-@ fib3 :: () -> { fib 3 == 3 } @-}
 fib3 :: () -> ()
-fib3 _ 
-  = fib 3 === fib 2 + fib 1 
-          === 2 + 1 
-          === 3 
-          *** QED
+fib3 _ = ()
+       
+
+
 
 -- | To automate such kind of standard evaluation steps, we can use the PLE flag.
 
 {-@ LIQUID "--ple" @-}
 
+
+
+
+
+
+
+
 fib3ple :: () -> ()
 {-@ fib3ple :: () -> { fib 3 == 3 } @-}
-fib3ple _ = ()
+fib3ple _ = () 
 
 
-{-@ fib16 :: { fib 16 == 1597 } @-}
+{-@ fib16 :: () -> { fib 16 == 1597 } @-}
 fib16 :: () -> ()
-fib16 _ = ()
+fib16 _ = () 
 
 
 ------------------------------------------------------------------------------------------
@@ -102,14 +116,17 @@ fib16 _ = ()
 
 {-@ fibIncr :: i:Nat -> { fib i <= fib (i+1) } @-}
 fibIncr :: Int -> ()
-fibIncr 0 = fib 0 === 1 =<= fib 1 *** QED
-fibIncr 1 = fib 1 === 1 =<= fib 2 *** QED
-fibIncr 2 = fib 2 === 2 =<= fib 3 *** QED
-fibIncr i =   fib i 
+fibIncr 0 = () 
+fibIncr 1 = ()
+fibIncr i =  fib i 
           === fib (i-1) + fib (i-2) ? fibIncr (i-2) ? fibIncr (i-1)
           =<= fib  i    + fib (i-1) 
           === fib (i+1) 
-          *** QED
+          *** QED 
+
+
+
+
 
 
 -- | Note that Liquid Haskell checks that the proof is terminating and that all cases are covered.
@@ -123,17 +140,19 @@ fibIncr i =   fib i
 
 {-@ fibMono :: i:Nat -> j:{Nat | i < j} -> { fib i <= fib j } / [j - i] @-}
 fibMono :: Int -> Int -> ()
-fibMono i j | j == i + 1
+fibMono i j  | j == i + 1
   = fibIncr i
-fibMono i j | j > i + 1
+fibMono i j  | j > i + 1
   = fib i       ? fibMono i (j-1)
   =<= fib (j-1) ? fibIncr (j-1)
   =<= fib j
-  *** QED
+  *** QED 
 
 -- Interestingly, the proof requires the `fibIncr` lemma, but not the definition of `fib` itself!
 -- So, we can abstract away the definition of `fib` and state that 
 -- each increasing function is monotonic! 
+
+
 
 {-@ fMono :: i:Nat -> j:{Nat | i < j} 
           -> f:(Nat -> Nat) -> fIncr:(x:Nat -> { f x <= f (x+1) })
@@ -146,6 +165,8 @@ fMono i j f fIncr | j > i + 1
   =<= f (j-1) ? fIncr (j-1)
   =<= f j
   *** QED
+
+
 
 
 -- | With that, monotonicity of Fibonacci can be proved as:
@@ -188,7 +209,7 @@ fibMono' i j = fMono i j fib fibIncr
 
 {-@ reachable8 :: () -> (x::Nat, { v:() | fib x == 8}) @-}
 reachable8 :: () -> (Int, ())
-reachable8 _ = (5, ())
+reachable8 _ = (5, liquidAssert (fib 5 == 8) ()) 
 
 
 ------------------------------------------------------------------------------------------
@@ -206,4 +227,23 @@ To show non reachability, we need to negate the existential.
 
 {-@ unreachable7 :: () -> ((x::Nat, { v:() | fib x == 7}) -> ({v:() |  False})) @-}
 unreachable7 :: () -> ((Int, ()) -> ())
-unreachable7 _ (x, _) = liquidAssert (fib x == 7) ()
+unreachable7 _ (x, _) | x > 7
+  = liquidAssert (fib x == 7) ()
+unreachable7 _ (x, _) | x < 0 
+  = liquidAssert (fib x == 7) ()
+unreachable7 _ (0, _) 
+  = liquidAssert (fib 0 /= 7) () 
+unreachable7 _ (1, _) 
+  = liquidAssert (fib 1 /= 7) () 
+unreachable7 _ (2, _) 
+  = liquidAssert (fib 2 /= 7) () 
+unreachable7 _ (3, _) 
+  = liquidAssert (fib 3 /= 7) () 
+unreachable7 _ (4, _) 
+  = liquidAssert (fib 4 /= 7) () 
+unreachable7 _ (5, _)   
+  = liquidAssert (fib 5 /= 7) () 
+unreachable7 _ (6, _) 
+  = liquidAssert (fib 6 /= 7) () 
+unreachable7 _ (7, _) 
+  = liquidAssert (fib 7 /= 7) ()
